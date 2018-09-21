@@ -10,5 +10,7 @@
 
 3. __4ead6b4__: En el archivo `app.js` crear los primeros componentes necesarios para mostrar un NavBar que permita seleccionar un rango de fechas. Utilizar el método `render`de `ReactDOM` para mostrar los componentes en la pantalla.
 
-4. Crear los componentes necesarios para mostrar la ficha de cada hotel y luego crear un componente contenedor encargado de renderizar el listado de hoteles _sin filtrar, por el momento_.
+4. __45eadc4__ Crear los componentes necesarios para mostrar la ficha de cada hotel y luego crear un componente contenedor encargado de renderizar el listado de hoteles _sin filtrar, por el momento_.
+
+5. Conectamos todos los componentes de nuestra aplicación y trabajamos en que los mismos compartar sus estádos y acciones para lograr reactividad dentro de nuestra aplicación utilizando la metodología _"Lifting State Up"_.
 

@@ -1,3 +1,6 @@
+// Definimos los datos estáticos que nuestra aplicación utilizará para funcionar.
+// En una aplicación convencional estos datos provendrían desde un back-end pero a los fines de este ejercisio utilizaremos variables pre-definidas.
+// Utilizamos fechas dinámicas para que la aplicación siempre muestre un rango de días entre la fecha actual y el futuro.
 const today = new Date()
 const hotelsData = [
   {
@@ -218,14 +221,27 @@ const hotelsData = [
   }
 ]
 
+// Le agregamos al objecto Date de JavaScript un método que convierta el valor de la instancia al formato necesario para ser compatible con el input del tipo date de HTML.
+Date.prototype.inputOf = function() {
+  return `${this.getFullYear()}-${String(this.getMonth() + 1).padStart(2,0)}-${String(this.getDate() + 1).padStart(2,0)}`
+}
+
 // Creamos el componente DateFilter para utilizarlo dentro del componente NavBar con el objetivo de permitir al usuario seleccione una fecha.
-// Por ahora sólo pensamos el método render() de este componente, más adelante definiremos su comportamiento.
 class DateFilter extends React.Component {
+  constructor(props) {
+    super(props)
+    this.handleDateChange = this.handleDateChange.bind(this)
+  }
+
+  handleDateChange(event) {
+    this.props.onDateChange(event)
+  }
+
   render() {
     return (
       <div className="field">
         <div className="control has-icons-left">
-          <input className="input is-medium" type="date" defaultValue={this.props.value} />
+          <input className="input is-medium" type="date" onChange={this.handleDateChange} value={this.props.date} name={this.props.name} />
           <span className="icon is-small is-left">
             <i className={'fas fa-' + this.props.icon}></i>
           </span>
@@ -236,13 +252,8 @@ class DateFilter extends React.Component {
 }
 
 // Creamos el componente NavBar que además de mostrar el logotipo de nuestra aplicación, utiliza el componente DateFilter dos veces para permitir al usuario seleccionar un rango de fechas.
-// Utilizamos una fecha dinámica para que la aplicación siempre muestre un rango de días entre la fecha actual y un mes hacia el futuro. Combertimos esas fechas a un formato de texto compatible con el input:date de HTML.
 class NavBar extends React.Component {
   render() {
-    let tomorrow = new Date(today.valueOf() + 86400000)
-    let dateFrom = `${today.getFullYear()}-${String(today.getMonth()).padStart(2,0)}-${String(today.getDate()).padStart(2,0)}`
-    let dateTo = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth()).padStart(2,0)}-${String(tomorrow.getDate()).padStart(2,0)}`
-
     return (
       <nav className="navbar is-primary is-fixed-top" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
@@ -252,10 +263,10 @@ class NavBar extends React.Component {
         </div>
         <div className="navbar-end">
           <div className="navbar-item">
-            <DateFilter value={dateFrom} icon="sign-in-alt" />
+            <DateFilter date={this.props.dateFrom} name="dateFrom" onDateChange={this.props.onDateChange} icon="sign-in-alt" />
           </div>
           <div className="navbar-item">
-            <DateFilter value={dateTo} icon="sign-out-alt" />
+            <DateFilter date={this.props.dateTo} name="dateTo" onDateChange={this.props.onDateChange} icon="sign-out-alt" />
           </div>
         </div>
       </nav>
@@ -263,6 +274,8 @@ class NavBar extends React.Component {
   }
 }
 
+// Es importante que idintifiquemos dónde estamos repitiendo código para crear los componentes necesesarios y lograr una aplicación más escalable.
+// Por esto creamos DataTag y PriceTag que son pequeños componentes que se repiten más de una vez en el componente Hotel.
 class DataTag extends React.Component {
   render() {
     return (
@@ -283,7 +296,7 @@ class PriceTag extends React.Component {
       if (i >= this.props.count) {
         style.opacity = '0.25'
       }
-      icons.push(<i className="fas fa-dollar-sign" style={style}></i>)
+      icons.push(<i className="fas fa-dollar-sign" style={style} key={i}></i>)
     }
 
     return (
@@ -296,6 +309,7 @@ class PriceTag extends React.Component {
   }
 }
 
+// Creamos el componente Hotel que tiene como objetivo representar visualmente cada uno de los hoteles del listado.
 class Hotel extends React.Component {
   render() {
     return (
@@ -322,9 +336,11 @@ class Hotel extends React.Component {
   }
 }
 
+// El componente Hotels (en plural) tiene como obejtivo filtrar los hoteles del arreglo en base a las fechas seleccionadas y mostrar los mismos renderizando repetidamente el componente Hotel.
 class Hotels extends React.Component {
   render() {
-    const hotels = hotelsData.map((hotel) => (
+    const hotels = hotelsData.filter(hotel => this.props.dateFrom <= hotel.availabilityFrom && this.props.dateTo <= hotel.availabilityTo).map((hotel) =>
+      (
         <div className="column is-one-third" key={hotel.slug}>
           <Hotel
             name={hotel.name}
@@ -350,13 +366,40 @@ class Hotels extends React.Component {
   }
 }
 
-// Instanciamos el componente NavBar dentro de una constante
-const app = (
-  <div>
-    <NavBar />
-    <Hotels />
-  </div>
-)
+// El componente App tiene como objetivo conectar los parámetros definidos por el NavBar (fechas) y aquellos utilizados por el componentes Hotels para que los mismos funcionen conectados de forma reactiva.
+// Esta metodología es llamada "Lifting State Up".
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      dateFrom: today,
+      dateTo: new Date(today.valueOf() + 86400000)
+    }
+
+    this.handleDateChange = this.handleDateChange.bind(this)
+  }
+
+  handleDateChange(event) {
+    let _state = this.state
+    _state[event.target.name] = new Date(event.target.value)
+    if (_state['dateFrom'].valueOf() >= _state['dateTo'].valueOf()) {
+      _state['dateTo'] = new Date(_state['dateFrom'].valueOf() + 86400000)
+    } else if (_state['dateTo'].valueOf() > _state['dateFrom'].valueOf() + 2592000000) {
+      _state['dateTo'] = new Date(_state['dateFrom'].valueOf() + 2592000000)
+    }
+    this.setState(_state)
+  }
+
+  render() {
+    return (
+      <div>
+        <NavBar onDateChange={this.handleDateChange} dateFrom={this.state.dateFrom.inputOf()} dateTo={this.state.dateTo.inputOf()} />
+        <Hotels dateFrom={this.state.dateFrom.valueOf()} dateTo={this.state.dateTo.valueOf()} />
+      </div>
+    )
+  }
+}
 
 // Renderizamos la aplicación utilizando el método render de ReactDOM
-ReactDOM.render(app, document.getElementById('app'))
+ReactDOM.render(<App />, document.getElementById('app'))

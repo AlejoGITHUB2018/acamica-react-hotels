@@ -29,7 +29,7 @@ class DateFilter extends React.Component {
   }
 
   render() {
-    let date = `${this.props.date.getFullYear()}-${String(this.props.date.getMonth() + 1).padStart(2,0)}-${String(this.props.date.getDate() + 1).padStart(2,0)}`
+    let date = `${this.props.date.getFullYear()}-${String(this.props.date.getMonth() + 1).padStart(2,0)}-${String(this.props.date.getDate()).padStart(2,0)}`
     return (
       <div className="field">
         <div className="control has-icons-left">

@@ -58,8 +58,7 @@ class OptionsFilter extends React.Component {
         <div className="control has-icons-left">
           <div className="select" style={ {width: '100%'} }>
             <select onChange={ this.handleOptionChange } value={ this.props.selected } style={ {width: '100%'} } name={ this.props.name }>
-              <option value="">{ this.props.placeholder }</option>
-              { this.props.options.map((option) => <option value={ option.value || option } key={ option.value || option }>{ option.name || option }</option> ) }
+              { this.props.options.map((option) => <option value={ option.value || '' } key={ option.value }>{ option.name }</option> ) }
             </select>
           </div>
           <div className="icon is-small is-left">
@@ -117,8 +116,7 @@ class Filters extends React.Component {
         <div className="navbar-item">
           <OptionsFilter
             onOptionChange={ this.handleOptionChange }
-            placeholder="Todos los países"
-            options={ [ 'Argentina', 'Brasil', 'Chile', 'Uruguay' ] }
+            options={ [ {value: undefined, name: 'Todos los países'}, {value: 'Argentina', name: 'Argentina'}, {value: 'Brasil', name: 'Brasil'}, {value: 'Chile', name: 'Chile'}, {value: 'Uruguay', name: 'Uruguay'} ] }
             selected={ this.props.filters.country }
             name="country"
             icon="globe" />
@@ -126,8 +124,7 @@ class Filters extends React.Component {
         <div className="navbar-item">
           <OptionsFilter
             onOptionChange={ this.handleOptionChange }
-            placeholder="Cualquier precio"
-            options={ [ {value: 1, name: '$'}, {value: 2, name: '$$'}, {value: 3, name: '$$$'}, {value: 4, name: '$$$$'} ] }
+            options={ [ {value: undefined, name: 'Cualquier precio'}, {value: 1, name: '$'}, {value: 2, name: '$$'}, {value: 3, name: '$$$'}, {value: 4, name: '$$$$'} ] }
             selected={ this.props.filters.price }
             name="price"
             icon="dollar-sign" />
@@ -135,8 +132,7 @@ class Filters extends React.Component {
         <div className="navbar-item">
           <OptionsFilter
             onOptionChange={ this.handleOptionChange }
-            placeholder="Cualquier tamaño"
-            options={ [ {value: 10, name: 'Hotel pequeño'}, {value: 20, name: 'Hotel mediano'}, {value: 30, name: 'Hotel grande'} ] }
+            options={ [ {value: undefined, name: 'Cualquier tamaño'}, {value: 10, name: 'Hotel pequeño'}, {value: 20, name: 'Hotel mediano'}, {value: 30, name: 'Hotel grande'} ] }
             selected={ this.props.filters.rooms }
             name="rooms"
             icon="bed" />
@@ -230,9 +226,9 @@ class App extends React.Component {
       filters: {
         dateFrom: today,
         dateTo: new Date(today.valueOf() + 86400000),
-        country: '',
-        price: 0,
-        rooms: 0
+        country: undefined,
+        price: undefined,
+        rooms: undefined
       },
       hotels: hotelsData
     }

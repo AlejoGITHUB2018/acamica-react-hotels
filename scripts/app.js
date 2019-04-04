@@ -35,7 +35,7 @@ class DateFilter extends React.Component {
         <div className="control has-icons-left">
           <input className="input" type="date" onChange={ this.handleDateChange } value={ date } name={ this.props.name } />
           <span className="icon is-small is-left">
-            <i className={'fas fa-' + this.props.icon}></i>
+            <i className={ `fas fa-${this.props.icon}` }></i>
           </span>
         </div>
       </div>
@@ -62,7 +62,7 @@ class OptionsFilter extends React.Component {
             </select>
           </div>
           <div className="icon is-small is-left">
-            <i className={'fas fa-' + this.props.icon}></i>
+            <i className={ `fas fa-${this.props.icon}` }></i>
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ function DataTag(props) {
   return (
     <div className="control">
       <div className="tags has-addons">
-        <span className="tag is-medium is-info"><i className={'fas fa-' + props.icon}></i></span>
+        <span className="tag is-medium is-info"><i className={ `fas fa-${props.icon}` }></i></span>
         <span className="tag is-medium">{props.children}</span>
       </div>
     </div>
@@ -183,8 +183,8 @@ function Hotel(props) {
         <p className="title is-4">{props.children.name}</p>
         <p>{props.children.description}</p>
         <div className="field is-grouped is-grouped-multiline" style={{marginTop: '1em'}}>
-          <DataTag icon="map-marker">{ props.children.city + ', ' + props.children.country }</DataTag>
-          <DataTag icon="bed">{ props.children.rooms + ' Habitaciones' }</DataTag>
+          <DataTag icon="map-marker">{ `${props.children.city}, ${props.children.country}` }</DataTag>
+          <DataTag icon="bed">{ `${props.children.rooms} Habitaciones` }</DataTag>
           <PriceTag count={props.children.price} />
         </div>
       </div>
